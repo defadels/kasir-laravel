@@ -14,7 +14,7 @@ class POSController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:access-pos');
+        // Middleware permissions are handled in routes/web.php
     }
 
     /**

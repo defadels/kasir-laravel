@@ -39,6 +39,8 @@ class RolePermissionSeeder extends Seeder
             'edit-transactions',
             'delete-transactions',
             'view-all-transactions',
+            'print-receipts',
+            'export-transactions',
 
             // User permissions
             'view-users',
@@ -64,24 +66,25 @@ class RolePermissionSeeder extends Seeder
 
         // Membuat permissions
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Membuat roles sesuai requirements: Owner dan Kasir
-        $ownerRole = Role::create(['name' => 'owner']);
-        $kasirRole = Role::create(['name' => 'kasir']);
+        $ownerRole = Role::firstOrCreate(['name' => 'owner']);
+        $kasirRole = Role::firstOrCreate(['name' => 'kasir']);
 
         // Assign permissions ke roles
 
         // Owner - memiliki semua permissions (master akses)
-        $ownerRole->givePermissionTo(Permission::all());
+        $ownerRole->syncPermissions(Permission::all());
 
         // Kasir - permissions untuk operasional kasir (transaksi dan monitoring stok)
-        $kasirRole->givePermissionTo([
+        $kasirRole->syncPermissions([
             'view-categories',
             'view-products',
             'view-transactions',
             'create-transactions',
+            'print-receipts',
             'view-dashboard',
             'access-pos',
             'process-sales',

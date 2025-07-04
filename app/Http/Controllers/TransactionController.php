@@ -8,12 +8,6 @@ use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:view-transactions')->only(['index', 'show']);
-        $this->middleware('permission:view-all-transactions')->only(['index']);
-    }
-
     /**
      * Display a listing of transactions
      */
@@ -61,11 +55,12 @@ class TransactionController extends Controller
 
         $transactions = $query->latest('transaction_date')->paginate(15);
 
-        // Calculate summary
+        // Calculate summary based on filtered results
+        $summaryQuery = clone $query;
         $summary = [
-            'total_transactions' => $query->count(),
-            'total_sales' => $query->sum('total_amount'),
-            'total_items' => $query->with('details')->get()->sum(function($transaction) {
+            'total_transactions' => $summaryQuery->count(),
+            'total_sales' => $summaryQuery->sum('total_amount'),
+            'total_items' => $summaryQuery->with('details')->get()->sum(function($transaction) {
                 return $transaction->details->sum('quantity');
             })
         ];

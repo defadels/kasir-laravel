@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:view-dashboard');
-    }
-
     /**
      * Display dashboard with required information
      */
@@ -176,6 +171,7 @@ class DashboardController extends Controller
             'pending_transactions' => Transaction::where('status', 'pending')->count(),
             'low_stock_count' => Product::lowStock()->active()->count(),
             'out_of_stock_count' => Product::active()->where('stock', 0)->where('track_stock', true)->count(),
+            'total_products' => Product::active()->count(),
         ];
 
         return response()->json($data);
