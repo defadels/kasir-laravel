@@ -9,7 +9,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -31,12 +31,15 @@ Route::middleware('auth')->group(function () {
     // Product routes with permissions
     Route::middleware('can:view-products')->group(function () {
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-        Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
     });
     
     Route::middleware('can:create-products')->group(function () {
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    });
+
+    Route::middleware('can:view-products')->group(function () {
+        Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
     });
     
     Route::middleware('can:edit-products')->group(function () {

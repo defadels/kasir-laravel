@@ -37,7 +37,7 @@ class ProductController extends Controller
         }
 
         // Filter by category
-        if ($request->has('category') && $request->category) {
+        if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
@@ -53,6 +53,9 @@ class ProductController extends Controller
 
         $products = $query->latest()->paginate(10);
         $categories = Category::active()->get();
+
+        // Append filter parameters to pagination links
+        $products->appends($request->query());
 
         return view('products.index', compact('products', 'categories'));
     }

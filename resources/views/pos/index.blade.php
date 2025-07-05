@@ -16,27 +16,36 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="max-w-[95rem] mx-auto sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 
-                <!-- Left Panel: Product Selection -->
-                <div class="lg:col-span-2">
+                <!-- Left Panel: Product Selection (3 columns) -->
+                <div class="lg:col-span-3">
                     <!-- Search Bar -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                         <div class="p-6">
-                            <div class="flex space-x-4">
-                                <div class="flex-1">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="md:col-span-3">
+                                    <label for="product-search" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Cari Produk
+                                    </label>
                                     <input type="text" 
                                            id="product-search" 
-                                           placeholder="Cari produk berdasarkan nama atau SKU..."
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                           placeholder="Cari berdasarkan nama produk atau SKU..."
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 </div>
-                                <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Semua Kategori</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div>
+                                    <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Kategori
+                                    </label>
+                                    <select id="category-filter" 
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                        <option value="">Semua Kategori</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -44,48 +53,62 @@
                     <!-- Product Grid -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Pilih Produk</h3>
-                            <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Pilih Produk</h3>
+                                <span class="text-sm text-gray-500">{{ $products->total() }} produk ditemukan</span>
+                            </div>
+                            <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 @foreach($products as $product)
-                                    <div class="product-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                    <div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
                                          data-product="{{ json_encode($product) }}">
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}" 
-                                                 alt="{{ $product->name }}"
-                                                 class="w-full h-24 object-cover rounded mb-2">
-                                        @else
-                                            <div class="w-full h-24 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                                                <span class="text-2xl">📦</span>
-                                            </div>
-                                        @endif
-                                        
-                                        <h4 class="font-medium text-sm text-gray-900 mb-1">{{ $product->name }}</h4>
-                                        <p class="text-xs text-gray-500 mb-1">SKU: {{ $product->sku }}</p>
-                                        <p class="text-xs text-gray-500 mb-2">{{ $product->category->name }}</p>
-                                        
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="font-bold text-blue-600">
-                                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                                            </span>
-                                            @if($product->track_stock)
-                                                <span class="text-xs px-2 py-1 rounded-full
-                                                    {{ $product->stock > $product->min_stock ? 'bg-green-100 text-green-800' : 
-                                                       ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                                    {{ $product->stock }} {{ $product->unit }}
-                                                </span>
+                                        <div class="aspect-w-1 aspect-h-1 w-full">
+                                            @if($product->image)
+                                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                                     alt="{{ $product->name }}"
+                                                     class="w-full h-full object-cover">
                                             @else
-                                                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                                    Unlimited
-                                                </span>
+                                                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                                    <span class="text-4xl">📦</span>
+                                                </div>
                                             @endif
                                         </div>
                                         
-                                        <button onclick="addToCart({{ $product->id }})" 
-                                                class="w-full bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded
-                                                {{ $product->track_stock && $product->stock <= 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                {{ $product->track_stock && $product->stock <= 0 ? 'disabled' : '' }}>
-                                            + Tambah ke Keranjang
-                                        </button>
+                                        <div class="p-4">
+                                            <div class="mb-3">
+                                                <h4 class="font-medium text-gray-900 mb-1 truncate">{{ $product->name }}</h4>
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-xs text-gray-500">{{ $product->sku }}</span>
+                                                    <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                                                        {{ $product->category->name }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center justify-between mb-3">
+                                                <span class="font-bold text-lg text-blue-600">
+                                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                                </span>
+                                                @if($product->track_stock)
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                        {{ $product->stock > $product->min_stock ? 'bg-green-100 text-green-800' : 
+                                                           ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                                        {{ $product->stock }} {{ $product->unit }}
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                                        ∞ Unlimited
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            
+                                            <button onclick="addToCart({{ $product->id }})" 
+                                                    class="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200
+                                                    {{ $product->track_stock && $product->stock <= 0 ? 'opacity-50 bg-gray-400 hover:bg-gray-400' : '' }}"
+                                                    {{ $product->track_stock && $product->stock <= 0 ? 'disabled' : '' }}>
+                                                <span class="text-xl">🛒</span>
+                                                <span>{{ $product->track_stock && $product->stock <= 0 ? 'Stok Habis' : 'Tambah ke Keranjang' }}</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -98,144 +121,184 @@
                     </div>
                 </div>
 
-                <!-- Right Panel: Cart & Checkout -->
+                <!-- Right Panel: Cart & Checkout (1 column) -->
                 <div class="lg:col-span-1">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg sticky top-4">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Keranjang Belanja</h3>
+                        <div class="divide-y divide-gray-200">
+                            <!-- Cart Header -->
+                            <div class="p-6">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-lg font-semibold text-gray-900">🛒 Keranjang Belanja</h3>
+                                    <span id="cart-count" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        0 item
+                                    </span>
+                                </div>
+                            </div>
                             
                             <!-- Cart Items -->
-                            <div id="cart-items" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
-                                @if(empty($cart))
-                                    <div id="empty-cart" class="text-center text-gray-500 py-8">
-                                        🛒 Keranjang kosong<br>
-                                        <span class="text-sm">Tambahkan produk dari panel kiri</span>
-                                    </div>
-                                @else
-                                    @foreach($cart as $item)
-                                        <div class="cart-item border-b border-gray-100 pb-3" data-product-id="{{ $item['id'] }}">
-                                            <div class="flex justify-between items-start">
-                                                <div class="flex-1">
-                                                    <h4 class="font-medium text-sm text-gray-900">{{ $item['name'] }}</h4>
-                                                    <p class="text-xs text-gray-500">{{ $item['sku'] }}</p>
-                                                    <p class="text-sm text-blue-600 font-medium">
-                                                        Rp {{ number_format($item['price'], 0, ',', '.') }}
-                                                    </p>
-                                                </div>
-                                                <button onclick="removeFromCart({{ $item['id'] }})" 
-                                                        class="text-red-500 hover:text-red-700 ml-2">
-                                                    ❌
-                                                </button>
-                                            </div>
-                                            <div class="flex items-center mt-2">
-                                                <button onclick="updateQuantity({{ $item['id'] }}, -1)" 
-                                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded-l">
-                                                    -
-                                                </button>
-                                                <input type="number" 
-                                                       value="{{ $item['quantity'] }}" 
-                                                       min="1"
-                                                       onchange="updateCartQuantity({{ $item['id'] }}, this.value)"
-                                                       class="w-16 text-center border-t border-b border-gray-200 py-1">
-                                                <button onclick="updateQuantity({{ $item['id'] }}, 1)" 
-                                                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-2 rounded-r">
-                                                    +
-                                                </button>
-                                                <span class="ml-2 text-sm text-gray-500">{{ $item['unit'] }}</span>
-                                            </div>
-                                            <div class="text-right mt-1">
-                                                <span class="font-bold text-gray-900">
-                                                    Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
-                                                </span>
-                                            </div>
+                            <div class="p-6">
+                                <div id="cart-items" class="space-y-3 max-h-[calc(100vh-42rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                    @if(empty($cart))
+                                        <div id="empty-cart" class="text-center py-6">
+                                            <div class="text-5xl mb-3">🛒</div>
+                                            <h4 class="text-lg font-medium text-gray-900 mb-1">Keranjang Kosong</h4>
+                                            <p class="text-sm text-gray-500">Tambahkan produk dari panel kiri</p>
                                         </div>
-                                    @endforeach
-                                @endif
+                                    @else
+                                        @foreach($cart as $item)
+                                            <div class="cart-item bg-gray-50 rounded-lg p-3" data-product-id="{{ $item['id'] }}">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <div class="flex-1 pr-4">
+                                                        <h4 class="font-medium text-gray-900 mb-0.5 text-sm">{{ $item['name'] }}</h4>
+                                                        <p class="text-xs text-gray-500">{{ $item['sku'] }}</p>
+                                                        <p class="text-sm font-semibold text-blue-600 mt-0.5">
+                                                            Rp {{ number_format($item['price'], 0, ',', '.') }}
+                                                        </p>
+                                                    </div>
+                                                    <button onclick="removeFromCart({{ $item['id'] }})" 
+                                                            class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors duration-200">
+                                                        ❌
+                                                    </button>
+                                                </div>
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-1">
+                                                        <button onclick="updateQuantity({{ $item['id'] }}, -1)" 
+                                                                class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium h-7 w-7 rounded-full flex items-center justify-center transition-colors duration-200">
+                                                            -
+                                                        </button>
+                                                        <input type="number" 
+                                                               value="{{ $item['quantity'] }}" 
+                                                               min="1"
+                                                               onchange="updateCartQuantity({{ $item['id'] }}, this.value)"
+                                                               class="w-14 text-center border border-gray-300 rounded-lg py-1 text-sm">
+                                                        <button onclick="updateQuantity({{ $item['id'] }}, 1)" 
+                                                                class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium h-7 w-7 rounded-full flex items-center justify-center transition-colors duration-200">
+                                                            +
+                                                        </button>
+                                                        <span class="text-xs text-gray-500">{{ $item['unit'] }}</span>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="text-sm font-bold text-gray-900">
+                                                            Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
 
                             <!-- Cart Summary -->
-                            <div class="border-t border-gray-200 pt-4" id="cart-summary">
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-sm">
-                                        <span>Subtotal:</span>
-                                        <span id="cart-subtotal">Rp 0</span>
+                            <div class="p-6">
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium text-gray-600">Subtotal</span>
+                                        <span id="cart-subtotal" class="text-sm font-bold text-gray-900">Rp 0</span>
                                     </div>
-                                    <div class="flex justify-between text-sm">
-                                        <span>Diskon:</span>
-                                        <input type="number" 
-                                               id="discount-amount" 
-                                               value="0" 
-                                               min="0"
-                                               placeholder="0"
-                                               class="w-20 text-right text-sm border border-gray-300 rounded px-2 py-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium text-gray-600">Diskon</span>
+                                        <div class="flex items-center space-x-1">
+                                            <span class="text-xs text-gray-500">Rp</span>
+                                            <input type="number" 
+                                                   id="discount-amount" 
+                                                   value="0" 
+                                                   min="0"
+                                                   placeholder="0"
+                                                   class="w-24 text-right text-sm bg-white border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        </div>
                                     </div>
-                                    <div class="flex justify-between text-sm">
-                                        <span>Pajak:</span>
-                                        <input type="number" 
-                                               id="tax-amount" 
-                                               value="0" 
-                                               min="0"
-                                               placeholder="0"
-                                               class="w-20 text-right text-sm border border-gray-300 rounded px-2 py-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium text-gray-600">Pajak</span>
+                                        <div class="flex items-center space-x-1">
+                                            <span class="text-xs text-gray-500">Rp</span>
+                                            <input type="number" 
+                                                   id="tax-amount" 
+                                                   value="0" 
+                                                   min="0"
+                                                   placeholder="0"
+                                                   class="w-24 text-right text-sm bg-white border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        </div>
                                     </div>
-                                    <div class="flex justify-between text-lg font-bold border-t pt-2">
-                                        <span>Total:</span>
-                                        <span id="cart-total">Rp 0</span>
+                                    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                                        <span class="text-base font-semibold text-gray-900">Total</span>
+                                        <span id="cart-total" class="text-lg font-bold text-blue-600">Rp 0</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Customer Info -->
-                            <div class="mt-4 space-y-3">
-                                <input type="text" 
-                                       id="customer-name" 
-                                       placeholder="Nama Customer (Opsional)"
-                                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500">
-                                <input type="text" 
-                                       id="customer-phone" 
-                                       placeholder="No. HP Customer (Opsional)"
-                                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500">
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="customer-name" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Informasi Pelanggan
+                                        </label>
+                                        <input type="text" 
+                                               id="customer-name" 
+                                               placeholder="Nama Pelanggan (Opsional)"
+                                               class="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <input type="text" 
+                                           id="customer-phone" 
+                                           placeholder="No. HP Pelanggan (Opsional)"
+                                           class="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
                             </div>
 
                             <!-- Payment Method -->
-                            <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
-                                <select id="payment-method" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500">
+                            <div class="p-6">
+                                <label for="payment-method" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Metode Pembayaran
+                                </label>
+                                <select id="payment-method" 
+                                        class="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="cash">💵 Tunai</option>
-                                    <option value="card">💳 Kartu</option>
+                                    <option value="card">💳 Kartu Debit/Kredit</option>
                                     <option value="qris">📱 QRIS</option>
-                                    <option value="transfer">🏦 Transfer</option>
+                                    <option value="transfer">🏦 Transfer Bank</option>
                                 </select>
                             </div>
 
                             <!-- Payment Amount -->
-                            <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Bayar</label>
-                                <input type="number" 
-                                       id="paid-amount" 
-                                       placeholder="0"
-                                       min="0"
-                                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500">
-                                <div class="mt-2 text-sm">
-                                    <span class="text-gray-600">Kembalian: </span>
-                                    <span id="change-amount" class="font-bold text-green-600">Rp 0</span>
+                            <div class="p-6">
+                                <label for="paid-amount" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Jumlah Bayar
+                                </label>
+                                <div class="flex items-center space-x-1">
+                                    <span class="text-sm text-gray-500">Rp</span>
+                                    <input type="number" 
+                                           id="paid-amount" 
+                                           placeholder="0"
+                                           min="0"
+                                           class="flex-1 px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-sm text-gray-600">Kembalian:</span>
+                                    <span id="change-amount" class="text-sm font-bold text-green-600">Rp 0</span>
                                 </div>
                             </div>
 
                             <!-- Notes -->
-                            <div class="mt-4">
+                            <div class="p-6">
+                                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Catatan Tambahan
+                                </label>
                                 <textarea id="notes" 
-                                          placeholder="Catatan (Opsional)"
+                                          placeholder="Catatan transaksi (Opsional)"
                                           rows="2"
-                                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                          class="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                             </div>
 
                             <!-- Checkout Button -->
-                            <button onclick="processCheckout()" 
-                                    id="checkout-btn"
-                                    class="w-full mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                                💳 Proses Pembayaran
-                            </button>
+                            <div class="p-6 bg-gray-50">
+                                <button onclick="processCheckout()" 
+                                        id="checkout-btn"
+                                        class="w-full flex items-center text-white justify-center space-x-2 bg-green-500 hover:bg-green-600 focus:bg-green-700 font-bold py-3 px-4 rounded-lg text-base transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span class="text-xl">💳</span>
+                                    <span>Proses Pembayaran</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
