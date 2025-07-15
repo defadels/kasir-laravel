@@ -242,11 +242,9 @@
                                                     </a>
                                                     
                                                     @if($transaction->status === 'completed')
-                                                        <button onclick="printReceipt('{{ $transaction->transaction_code }}')" 
-                                                                class="text-green-600 hover:text-green-900"
-                                                                title="Print Struk">
+                                                        <a href="{{ route('transactions.receipt', $transaction) }}" target="_blank" class="text-green-600 hover:text-green-900" title="Print/Download Struk">
                                                             🖨️
-                                                        </button>
+                                                        </a>
                                                     @endif
                                                 </div>
                                             </td>
@@ -292,12 +290,7 @@
         }
 
         function printReceipt(transactionCode) {
-            // Here you can implement receipt printing functionality
-            // For now, we'll just show a notification
-            alert('🖨️ Fitur print struk untuk transaksi ' + transactionCode + ' akan segera tersedia!');
-            
-            // Example implementation for future use:
-            // window.open('/transactions/' + transactionCode + '/receipt', '_blank', 'width=400,height=600');
+            // Fungsi lama di-nonaktifkan, sudah diganti ke link PDF
         }
     </script>
 </x-app-layout> 

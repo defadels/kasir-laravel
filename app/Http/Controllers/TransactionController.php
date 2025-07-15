@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransactionController extends Controller
 {
@@ -81,6 +82,25 @@ class TransactionController extends Controller
         $transaction->load(['user', 'details.product.category']);
 
         return view('transactions.show', compact('transaction'));
+    }
+
+    /**
+     * Print/download receipt as PDF
+     */
+    public function printReceipt(Transaction $transaction)
+    {
+        // Check permission
+        if (!auth()->user()->can('print-receipts')) {
+            abort(403, 'Anda tidak memiliki izin untuk mencetak struk.');
+        }
+        // Pastikan user hanya bisa print transaksi miliknya jika bukan owner
+        if (!auth()->user()->hasRole('owner') && $transaction->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses untuk transaksi ini.');
+        }
+        $transaction->load(['user', 'details.product.category']);
+        $pdf = Pdf::loadView('transactions.receipt', compact('transaction'));
+        $filename = 'Struk-' . $transaction->transaction_code . '.pdf';
+        return $pdf->download($filename);
     }
 
     /**

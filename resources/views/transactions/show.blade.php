@@ -10,9 +10,9 @@
                 </a>
                 @if($transaction->status === 'completed')
                     @can('print-receipts')
-                        <button onclick="printReceipt()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                            🖨️ Print Struk
-                        </button>
+                        <a href="{{ route('transactions.receipt', $transaction) }}" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            🖨️ Print/Download Struk (PDF)
+                        </a>
                     @endcan
                 @endif
             </div>
@@ -269,8 +269,6 @@
     </div>
 
     <script>
-        function printReceipt() {
-            window.showNotification('info', 'Print Struk', 'Fitur print struk untuk transaksi {{ $transaction->transaction_code }} akan segera tersedia!');
-        }
+        // Hapus fungsi printReceipt lama, tidak perlu lagi
     </script>
 </x-app-layout> 
